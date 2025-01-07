@@ -1,4 +1,10 @@
-import { HomeIcon, LibraryIcon, PodcastIcon, SettingsIcon } from "lucide-react";
+import {
+  BoxesIcon,
+  HomeIcon,
+  LibraryIcon,
+  PodcastIcon,
+  SettingsIcon,
+} from "lucide-react";
 import {
   SidebarContent,
   SidebarFooter,
@@ -44,6 +50,14 @@ export const Sidebar = () => {
                   <Link to="/library">
                     <LibraryIcon />
                     <span>Library</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <Link to="/tasks">
+                    <BoxesIcon />
+                    <span>Tasks</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

@@ -7,15 +7,17 @@ import { Sidebar } from "@/components/sidebar";
 
 export const BaseLayout: React.FC<PropsWithChildren> = ({ children }) => {
   return (
-    <div className={`w-screen h-screen flex bg-background text-foreground`}>
+    <div className={`w-screen h-screen flex bg-transparent text-foreground`}>
       <Sidebar />
 
-      <main className="w-full">
+      <div className="w-full h-screen flex flex-col gap-2">
         <Titlebar />
-        {children}
-        <TanStackRouterDevtools position="bottom-right" />
-        {/* <TailwindIndicator /> */}
-      </main>
+        <main className="w-full flex-auto flex flex-col min-h-0">
+          {children}
+        </main>
+      </div>
+      <TanStackRouterDevtools position="bottom-right" />
+      {/* <TailwindIndicator /> */}
     </div>
   );
 };

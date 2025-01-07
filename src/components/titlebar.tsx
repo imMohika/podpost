@@ -1,17 +1,32 @@
 import { getCurrentWindow } from "@tauri-apps/api/window";
 
-import { Minimize2Icon, SidebarClose, XIcon } from "lucide-react";
+import { Maximize2Icon, Minimize2Icon, MinusIcon, XIcon } from "lucide-react";
 import { Button } from "./ui/button";
 import { ThemeToggle } from "./theme";
 import { SidebarTrigger } from "./ui/sidebar";
+import { useEffect, useState } from "react";
 
 export const Titlebar = () => {
+  const [isMaximized, setMaximized] = useState(false);
+  useEffect(() => {
+    const initialMaximized = async () => {
+      const state = await getCurrentWindow().isMaximized();
+      setMaximized(state);
+    };
+    initialMaximized();
+  }, []);
+
   const close = () => {
     getCurrentWindow().close();
   };
 
   const minimize = () => {
     getCurrentWindow().minimize();
+  };
+
+  const toggleMaximize = async () => {
+    await getCurrentWindow().toggleMaximize();
+    setMaximized((current) => !current);
   };
 
   return (
@@ -25,7 +40,11 @@ export const Titlebar = () => {
       <div className="flex text-sm">
         <ThemeToggle />
         <Button variant="ghost" size="icon" onClick={() => minimize()}>
-          <Minimize2Icon />
+          <MinusIcon />
+        </Button>
+
+        <Button variant="ghost" size="icon" onClick={() => toggleMaximize()}>
+          {isMaximized ? <Minimize2Icon /> : <Maximize2Icon />}
         </Button>
 
         <Button variant="ghost" size="icon" onClick={() => close()}>
