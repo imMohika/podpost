@@ -1,4 +1,14 @@
 import { fetch } from "@tauri-apps/plugin-http";
+import {
+  DefaultSpeechToTextParams,
+  SpeechToTextComputeType,
+  SpeechToTextDevice,
+  SpeechToTextinterpolateMethod,
+  SpeechToTextLanguage,
+  SpeechToTextTask,
+  TranscribeModel,
+} from "./constants";
+import { getApiBase } from "./utils";
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export interface FileSSTResponse {
@@ -7,30 +17,17 @@ export interface FileSSTResponse {
 }
 
 export interface SpeechToTextParams {
-  language?: string;
-  task?: "transcribe" | "translate";
-  model?:
-    | "tiny"
-    | "tiny.en"
-    | "base"
-    | "base.en"
-    | "small"
-    | "small.en"
-    | "medium"
-    | "medium.en"
-    | "large"
-    | "large-v1"
-    | "large-v2"
-    | "large-v3"
-    | "large-v3-turbo";
-  device?: "cuda" | "cpu";
+  language?: SpeechToTextLanguage;
+  task?: SpeechToTextTask;
+  model?: TranscribeModel;
+  device?: SpeechToTextDevice;
   deviceIndex?: number;
   threads?: number;
   batchSize?: number;
   chunkSize?: number;
-  computeType?: "int8" | "float16" | "float32";
+  computeType?: SpeechToTextComputeType;
   alignModel?: string;
-  interpolateMethod?: "nearest" | "linear" | "ignore";
+  interpolateMethod?: SpeechToTextinterpolateMethod;
   returnCharAlignments?: boolean;
   minSpeakers?: number;
   maxSpeakers?: number;
@@ -49,32 +46,6 @@ export interface SpeechToTextParams {
   vadOnset?: number;
   vadOffset?: number;
 }
-
-export const DefaultSpeechToTextParams: SpeechToTextParams = {
-  language: "en",
-  task: "transcribe",
-  model: "tiny.en",
-  device: "cuda",
-  deviceIndex: 0,
-  threads: 0,
-  batchSize: 8,
-  chunkSize: 20,
-  computeType: "float16",
-  interpolateMethod: "nearest",
-  returnCharAlignments: true,
-  minSpeakers: 1,
-  beamSize: 5,
-  bestOf: 5,
-  patience: 1,
-  lengthPenalty: 1,
-  temperatures: 0,
-  compressionRatioThreshold: 2.4,
-  logProbThreshold: -1,
-  noSpeechThreshold: 0.6,
-  suppressTokens: -1,
-  vadOnset: 0.5,
-  vadOffset: 0.363,
-};
 
 const mapParamsToQuery = (
   params: SpeechToTextParams
@@ -117,13 +88,11 @@ const mapParamsToQuery = (
 
 export const SpeechToText = async (
   fileData: Uint8Array,
-  params: SpeechToTextParams = {}
+  params = DefaultSpeechToTextParams
 ): Promise<FileSSTResponse> => {
-  const baseURL = "http://localhost:8200";
-  const endpoint = "/speech-to-text";
   const mappedParams = mapParamsToQuery(params);
   const queryString = new URLSearchParams(mappedParams).toString();
-  const url = `${baseURL}${endpoint}?${queryString}`;
+  const url = `${getApiBase()}/speech-to-text?${queryString}`;
   console.info("Sending file for speech-to-text processing...");
 
   const form = new FormData();

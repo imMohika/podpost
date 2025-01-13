@@ -1,5 +1,12 @@
 import { queryOptions } from "@tanstack/react-query";
 import { fetch } from "@tauri-apps/plugin-http";
+import { getApiBase } from "./utils";
+import {
+  SpeechToTextComputeType,
+  SpeechToTextDevice,
+  SpeechToTextLanguage,
+  SpeechToTextTask,
+} from "./constants";
 
 export type TaskType = "transcription" | "full_process";
 
@@ -10,16 +17,17 @@ export interface TaskStatus {
 }
 
 export const TaskAll = async (): Promise<TaskStatus[]> => {
-  const base = "http://localhost:8200";
   console.info("Fetching all tasks...");
-  const url = `${base}/task/all`;
+  const url = `${getApiBase()}/task/all`;
 
   await new Promise((r) => setTimeout(r, 500));
 
   const response = await fetch(url);
+
   type JSONResponse = {
     tasks: TaskStatus[];
   };
+
   const { tasks }: JSONResponse = await response.json();
   console.log({ tasks });
   return tasks ?? [];
@@ -44,33 +52,30 @@ export interface TaskResult {
 
 export interface TaskMetadata {
   task_type: string;
-  // todo)) task_params
-  // "task_params": {
-  //   "language": "en",
-  //   "task": "transcribe",
-  //   "model": "tiny.en",
-  //   "device": "cuda",
-  //   "device_index": 0,
-  //   "threads": 0,
-  //   "batch_size": 8,
-  //   "chunk_size": 20,
-  //   "compute_type": "float16",
-  //   "asr_options": {
-  //     "beam_size": 5,
-  //     "best_of": 5,
-  //     "patience": 1,
-  //     "length_penalty": 1,
-  //     "temperatures": 0,
-  //     "compression_ratio_threshold": 2.4,
-  //     "log_prob_threshold": -1,
-  //     "no_speech_threshold": 0.6,
-  //     "initial_prompt": null,
-  //     "suppress_tokens": [
-  //       -1
-  //     ],
-  //     "suppress_numerals": false,
-  //     "hotwords": null
-  //   },
+  task_params: {
+    language: SpeechToTextLanguage;
+    task: SpeechToTextTask;
+    device: SpeechToTextDevice;
+    device_index: number;
+    threads: 0;
+    batch_size: number;
+    chunk_size: 20;
+    compute_type: SpeechToTextComputeType;
+    asr_options: {
+      beam_size: number;
+      best_of: number;
+      patience: number;
+      length_penalty: number;
+      temperatures: number;
+      compression_ratio_threshold: number;
+      log_prob_threshold: number;
+      no_speech_threshold: number;
+      initial_prompt: string | null;
+      suppress_tokens: Array<number>;
+      suppress_numerals: boolean;
+      hotwords: string;
+    };
+  };
   vad_options: {
     vad_onset: number;
     vad_offset: number;
@@ -92,9 +97,8 @@ export interface TaskInfo {
 }
 
 export const TaskInfo = async (identifier: string): Promise<TaskInfo> => {
-  const base = "http://localhost:8200";
   console.info(`Fetching task info for ${identifier}...`);
-  const url = `${base}/task/${identifier}`;
+  const url = `${getApiBase()}/task/${identifier}`;
 
   await new Promise((r) => setTimeout(r, 500));
 

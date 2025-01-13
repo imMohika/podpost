@@ -1,14 +1,10 @@
-import { RelativeTime } from "@/components/relative-time";
+import { AddPodcastButton } from "@/components/podcast/add-podcast-button";
+import { RefetchButton } from "@/components/refetch-button";
 import { TaskTable } from "@/components/task-table";
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Tooltip, TooltipContent } from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
 import { TaskAllQueryOptions } from "@/sdk/sdk";
-import { TooltipProvider, TooltipTrigger } from "@radix-ui/react-tooltip";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { RefreshCwIcon } from "lucide-react";
 
 export const Route = createFileRoute("/tasks/")({
   loader: ({ context: { queryClient } }) =>
@@ -23,28 +19,14 @@ function TasksComponent() {
     <div className="p-4 flex flex-col gap-2">
       <div className="w-full flex justify-between">
         <p className="font-semibold text-xl">Task List</p>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant={"outline"}
-                size={"icon"}
-                className="group"
-                onClick={() => refetch()}
-              >
-                <RefreshCwIcon
-                  className={cn(
-                    "transition-all",
-                    isFetching ? "animate-spin" : ""
-                  )}
-                />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              Last fetched <RelativeTime timestamp={dataUpdatedAt} />
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <div className="flex gap-4">
+          <AddPodcastButton />
+          <RefetchButton
+            refetch={refetch}
+            isFetching={isFetching}
+            lastFetched={dataUpdatedAt}
+          />
+        </div>
       </div>
       {tasks ? <TaskTable data={tasks} /> : <Skeleton />}
     </div>

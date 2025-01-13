@@ -1,3 +1,4 @@
+import { invoke } from "@tauri-apps/api/core";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -71,4 +72,34 @@ export function prettifyDate(dateString: string): string {
     console.error("Error prettifying date string:", error);
     return "Invalid date";
   }
+}
+export async function computePartialFileHash(
+  filePath: string,
+  file: Uint8Array
+) {
+  // try to hash with rust
+  const chunkSize = 16 * 1024;
+  try {
+    const hash = await invoke<string>("partial_file_hash", {
+      filePath,
+      chunkSize,
+    });
+    if (hash && hash.length > 0) {
+      return hash;
+    }
+  } catch (error) {
+    console.error("Failed to hash file with Rust:", error);
+  }
+
+  // hash with js
+  const first = file.slice(0, chunkSize);
+  const last = file.slice(-chunkSize);
+  const combined = new Uint8Array(first.length + last.length);
+  combined.set(first);
+  combined.set(last, first.length);
+
+  const hashBuffer = await crypto.subtle.digest("SHA-256", combined.buffer);
+  return Array.from(new Uint8Array(hashBuffer))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
 }
