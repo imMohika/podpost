@@ -2,7 +2,7 @@ import { AddPodcastButton } from "@/components/podcast/add-podcast-button";
 import { RefetchButton } from "@/components/refetch-button";
 import { TaskTable } from "@/components/task-table";
 import { Skeleton } from "@/components/ui/skeleton";
-import { TaskAllQueryOptions } from "@/sdk/sdk";
+import { TaskAllQueryOptions } from "@/sdk/task";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 

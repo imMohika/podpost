@@ -1,5 +1,6 @@
 import { CopyButton } from "@/components/copy-button";
 import { RelativeDate } from "@/components/relative-date";
+import { TaskDeleteButton } from "@/components/task-delete-button";
 import { TaskStatus } from "@/components/task-status";
 import { TaskType } from "@/components/task-type";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -17,9 +18,15 @@ import {
   ResultSegment,
   TaskInfo as TTaskInfo,
   TaskInfoQueryOptions,
-} from "@/sdk/sdk";
+} from "@/sdk/task";
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Link,
+  useNavigate,
+  useRouter,
+  useRouterState,
+} from "@tanstack/react-router";
 import {
   ArrowLeftIcon,
   ArrowRightIcon,
@@ -39,6 +46,7 @@ export const Route = createFileRoute("/tasks/$identifier")({
 
 function RouteComponent() {
   const { identifier } = Route.useParams();
+  const navigate = useNavigate();
   const infoQuery = useQuery(TaskInfoQueryOptions(identifier));
   const { data: info } = infoQuery;
   return (
@@ -64,10 +72,12 @@ function RouteComponent() {
           )}
         </div>
 
-        <Button variant={"destructive"}>
-          <TrashIcon size={18} />
-          Delete
-        </Button>
+        <TaskDeleteButton
+          identifier={identifier}
+          after={() => {
+            navigate({ to: "/tasks" });
+          }}
+        />
       </div>
 
       {info ? <TaskInfo info={info} /> : <Skeleton className="w-full h-12" />}

@@ -113,3 +113,14 @@ export const TaskInfoQueryOptions = (identifier: string) =>
     queryKey: ["task", identifier],
     queryFn: () => TaskInfo(identifier),
   });
+
+export const TaskDelete = async (identifier: string): Promise<void> => {
+  console.info(`Deleting task with id ${identifier}...`);
+  const url = `${getApiBase()}/task/${identifier}/delete`;
+
+  return new Promise((r) => {
+    fetch(url, {
+      method: "DELETE",
+    }).then(() => r());
+  });
+};

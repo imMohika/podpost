@@ -1,5 +1,5 @@
 import { shorten, cn } from "@/lib/utils";
-import { TaskStatus } from "@/sdk/sdk";
+import { TaskStatus } from "@/sdk/task";
 import {
   Column,
   ColumnDef,
@@ -45,6 +45,7 @@ import {
 import { Link } from "@tanstack/react-router";
 import { TaskStatus as TaskStatusComp } from "./task-status";
 import { TaskType } from "./task-type";
+import { TaskDeleteButton } from "./task-delete-button";
 
 const taskTypes = [
   {
@@ -111,9 +112,7 @@ const columns: ColumnDef<TaskStatus>[] = [
             </Link>
           </Button>
 
-          <Button variant={"destructive"} size={"icon"}>
-            <TrashIcon />
-          </Button>
+          <TaskDeleteButton identifier={identifier} type="icon" />
         </div>
       );
     },
