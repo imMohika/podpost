@@ -17,11 +17,19 @@
     "dialog:allow-open",
     "dialog:default",
     "fs:default",
+    "fs:allow-write",
+    "fs:allow-copy-file",
     {
       "identifier": "fs:scope",
       "allow": [
         {
-          "path": "$RESOURCE/**/*"
+          "path": "**"
+        },
+        {
+          "path": "**/*"
+        },
+        {
+          "path": "/**/*"
         }
       ]
     },

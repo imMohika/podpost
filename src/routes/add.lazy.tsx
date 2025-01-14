@@ -1,4 +1,5 @@
 import { SelectPodcastButton } from "@/components/podcast/select-podcast-button";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,18 +11,30 @@ import {
 } from "@/components/ui/tooltip";
 import { computePartialFileHash } from "@/lib/utils";
 import { podcastStoreSelectors, usePodcastStore } from "@/store/podcast";
-import { createLazyFileRoute } from "@tanstack/react-router";
-import { readFile } from "@tauri-apps/plugin-fs";
+import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
+import { readFile, copyFile, exists, mkdir } from "@tauri-apps/plugin-fs";
 import { InfoIcon } from "lucide-react";
 import { parseBuffer } from "music-metadata";
 import { useEffect, useState } from "react";
+import {
+  appLocalDataDir,
+  BaseDirectory,
+  basename,
+  resolve,
+} from "@tauri-apps/api/path";
+import { SpeechToText } from "@/sdk/file";
+import { db } from "@/db/db";
+import { filesSchema } from "@/db/schema";
 
 export const Route = createLazyFileRoute("/add")({
   component: AddComponent,
 });
 
 function AddComponent() {
+  const navigate = useNavigate();
   const path = podcastStoreSelectors.use.path();
+  const fileData = podcastStoreSelectors.use.data();
+  const fileHash = podcastStoreSelectors.use.hash();
   const updatePath = podcastStoreSelectors.use.updatePath();
   const updateData = podcastStoreSelectors.use.updateData();
   const updateHash = podcastStoreSelectors.use.updateHash();
@@ -60,6 +73,56 @@ function AddComponent() {
     });
   };
 
+  const addPodcast = async () => {
+    if (!path || path === "") return;
+    if (!fileData) {
+      await loadFile(path);
+      if (!fileData) {
+        console.error("file data is null after loadFile");
+        return;
+      }
+    }
+
+    if (!fileHash) {
+      await hashFile(path, fileData);
+      if (!fileHash) {
+        console.error("file hash is null after hashFile");
+        return;
+      }
+    }
+
+    const fileName = await basename(path);
+    const toPath = await resolve(await appLocalDataDir(), "library", fileName);
+
+    const libraryExists = await exists("library", {
+      baseDir: BaseDirectory.AppLocalData,
+    });
+    if (!libraryExists) {
+      await mkdir("library", {
+        baseDir: BaseDirectory.AppLocalData,
+      });
+    }
+    console.log({ toPath, libraryExists });
+
+    await copyFile(path, toPath);
+
+    const { identifier } = await SpeechToText(fileData);
+
+    await db.insert(filesSchema).values({
+      filePath: toPath,
+      fileHash: fileHash,
+      taskIdentifier: identifier,
+      // todo)) save metadata
+    });
+
+    navigate({
+      to: "/tasks/$identifier",
+      params: {
+        identifier,
+      },
+    });
+  };
+
   // initial file load
   useEffect(() => {
     if (!path || path === "") return;
@@ -87,7 +150,11 @@ function AddComponent() {
           <p className="font-semibold">Metadata</p>
           <PodcastMetadata />
         </div>
-        <div className="w-full h-full"></div>
+        <div className="w-full h-full">
+          <div className="justify-self-end">
+            <Button onClick={() => addPodcast()}>Add</Button>
+          </div>
+        </div>
       </div>
     </div>
   );
