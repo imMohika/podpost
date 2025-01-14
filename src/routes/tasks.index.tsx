@@ -3,17 +3,18 @@ import { RefetchButton } from "@/components/refetch-button";
 import { TaskTable } from "@/components/task-table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TaskAllQueryOptions } from "@/sdk/sdk";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/tasks/")({
-  loader: ({ context: { queryClient } }) =>
-    queryClient.ensureQueryData(TaskAllQueryOptions),
+  loader: ({ context: { queryClient } }) => {
+    queryClient.prefetchQuery(TaskAllQueryOptions);
+  },
   component: TasksComponent,
 });
 
 function TasksComponent() {
-  const tasksQuery = useSuspenseQuery(TaskAllQueryOptions);
+  const tasksQuery = useQuery(TaskAllQueryOptions);
   const { data: tasks, isFetching, refetch, dataUpdatedAt } = tasksQuery;
   return (
     <div className="p-4 flex flex-col gap-2">
@@ -28,7 +29,11 @@ function TasksComponent() {
           />
         </div>
       </div>
-      {tasks ? <TaskTable data={tasks} /> : <Skeleton />}
+      {tasks ? (
+        <TaskTable data={tasks} />
+      ) : (
+        <Skeleton className="w-full h-12" />
+      )}
     </div>
   );
 }

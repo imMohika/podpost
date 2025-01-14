@@ -11,30 +11,35 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Skeleton } from "@/components/ui/skeleton";
 import { shorten } from "@/lib/utils";
-import { ResultSegment, TaskInfo, TaskInfoQueryOptions } from "@/sdk/sdk";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import {
+  ResultSegment,
+  TaskInfo as TTaskInfo,
+  TaskInfoQueryOptions,
+} from "@/sdk/sdk";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ArrowLeftIcon,
   ArrowRightIcon,
   ChevronsUpDownIcon,
   CircleXIcon,
-  Scroll,
   TextIcon,
   TrashIcon,
 } from "lucide-react";
 import { useState } from "react";
 
 export const Route = createFileRoute("/tasks/$identifier")({
-  loader: ({ context: { queryClient }, params }) =>
-    queryClient.ensureQueryData(TaskInfoQueryOptions(params.identifier)),
+  loader: ({ context: { queryClient }, params }) => {
+    queryClient.prefetchQuery(TaskInfoQueryOptions(params.identifier));
+  },
   component: RouteComponent,
 });
 
 function RouteComponent() {
   const { identifier } = Route.useParams();
-  const infoQuery = useSuspenseQuery(TaskInfoQueryOptions(identifier));
+  const infoQuery = useQuery(TaskInfoQueryOptions(identifier));
   const { data: info } = infoQuery;
   return (
     <div className="p-4 flex flex-col gap-2 h-full w-full">
@@ -52,7 +57,11 @@ function RouteComponent() {
             <code className="font-mono text-base">{shorten(identifier)}</code>
             <CopyButton value={identifier} />
           </div>
-          <TaskStatus status={info.status} />
+          {info ? (
+            <TaskStatus status={info.status} />
+          ) : (
+            <Skeleton className="w-full h-6" />
+          )}
         </div>
 
         <Button variant={"destructive"}>
@@ -61,29 +70,36 @@ function RouteComponent() {
         </Button>
       </div>
 
-      {info.error && (
-        <Alert>
-          <CircleXIcon />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>{info.error}</AlertDescription>
-        </Alert>
-      )}
-
-      <div className="p-4 flex flex-col gap-4 flex-auto min-h-0">
-        <TaskMetadata metadata={info.metadata} />
-        {info.result && (
-          <div className="flex flex-col flex-auto min-h-0">
-            <ScrollArea className="w-full h-full rounded-md border">
-              <TaskResult result={info.result} />
-            </ScrollArea>
-          </div>
-        )}
-      </div>
+      {info ? <TaskInfo info={info} /> : <Skeleton className="w-full h-12" />}
     </div>
   );
 }
 
-const TaskResult: React.FC<{ result: TaskInfo["result"] }> = ({ result }) => {
+const TaskInfo: React.FC<{ info: TTaskInfo }> = ({ info }) => {
+  if (info.error) {
+    return (
+      <Alert>
+        <CircleXIcon />
+        <AlertTitle>Error</AlertTitle>
+        <AlertDescription>{info.error}</AlertDescription>
+      </Alert>
+    );
+  }
+  return (
+    <div className="p-4 flex flex-col gap-4 flex-auto min-h-0">
+      <TaskMetadata metadata={info.metadata} />
+      {info.result && (
+        <div className="flex flex-col flex-auto min-h-0">
+          <ScrollArea className="w-full h-full rounded-md border">
+            <TaskResult result={info.result} />
+          </ScrollArea>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const TaskResult: React.FC<{ result: TTaskInfo["result"] }> = ({ result }) => {
   if (!result) {
     return (
       <div className="w-full max-w-xl space-y-2 rounded-md border px-4 py-2  shadow-sm">
@@ -134,7 +150,7 @@ const TaskResult: React.FC<{ result: TaskInfo["result"] }> = ({ result }) => {
   );
 };
 
-const TaskMetadata: React.FC<{ metadata: TaskInfo["metadata"] }> = ({
+const TaskMetadata: React.FC<{ metadata: TTaskInfo["metadata"] }> = ({
   metadata,
 }) => {
   const [isOpen, setIsOpen] = useState(false);

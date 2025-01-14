@@ -4,6 +4,7 @@ import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import "@/styles/tailwind.css";
 import { Titlebar } from "@/components/titlebar";
 import { Sidebar } from "@/components/sidebar";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export const BaseLayout: React.FC<PropsWithChildren> = ({ children }) => {
   return (
@@ -13,7 +14,7 @@ export const BaseLayout: React.FC<PropsWithChildren> = ({ children }) => {
       <div className="w-full h-screen flex flex-col gap-2">
         <Titlebar />
         <main className="w-full flex-auto flex flex-col min-h-0">
-          {children}
+          <ScrollArea>{children}</ScrollArea>
         </main>
       </div>
       <TanStackRouterDevtools position="bottom-right" />
