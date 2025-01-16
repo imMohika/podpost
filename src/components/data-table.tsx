@@ -1,41 +1,32 @@
 import { cn } from "@/lib/utils";
 import {
-  Column,
-  ColumnDef,
-  ColumnFiltersState,
+  type Column,
+  type ColumnDef,
+  type ColumnFiltersState,
+  type SortingState,
+  type Table as TTable,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  SortingState,
-  Table as TTable,
   useReactTable,
 } from "@tanstack/react-table";
 import {
-  CheckIcon,
-  PlusCircleIcon,
-  ChevronsLeftIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  ChevronsRightIcon,
   ArrowDownIcon,
   ArrowUpIcon,
+  CheckIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ChevronsLeftIcon,
+  ChevronsRightIcon,
   ChevronsUpDownIcon,
+  PlusCircleIcon,
 } from "lucide-react";
-import { Button } from "./ui/button";
-import {
-  TableHeader,
-  TableRow,
-  TableHead,
-  TableBody,
-  TableCell,
-  Table,
-} from "./ui/table";
+import type React from "react";
+import { createContext, useContext, useState } from "react";
 import { Badge } from "./ui/badge";
-import React, { createContext, useContext, useState } from "react";
-import { Separator } from "./ui/separator";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { Button } from "./ui/button";
 import {
   Command,
   CommandEmpty,
@@ -46,18 +37,28 @@ import {
   CommandSeparator,
 } from "./ui/command";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
+import { Separator } from "./ui/separator";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "./ui/table";
 import { Toggle } from "./ui/toggle";
 
 interface DataTableContextType<TData, TValue> {
@@ -66,8 +67,9 @@ interface DataTableContextType<TData, TValue> {
   table: TTable<TData>;
 }
 
+// biome-ignore lint/suspicious/noExplicitAny: using genrics
 const DataTableContext = createContext<DataTableContextType<any, any> | null>(
-  null
+  null,
 );
 
 interface DataTableProviderProps<TData, TValue> {
@@ -111,7 +113,7 @@ export function useDataTable<TData, TValue>() {
     DataTableContext as React.Context<DataTableContextType<
       TData,
       TValue
-    > | null>
+    > | null>,
   );
   if (!context) {
     throw new Error("useDataTable must be used within a DataTableProvider");
@@ -136,7 +138,7 @@ export const DataTable = () => {
                       ? null
                       : flexRender(
                           header.column.columnDef.header,
-                          header.getContext()
+                          header.getContext(),
                         )}
                   </TableHead>
                 );
@@ -388,7 +390,7 @@ export function DataTableFacetedFilter({
                       }
                       const filterValues = Array.from(selectedValues);
                       column.setFilterValue(
-                        filterValues.length ? filterValues : undefined
+                        filterValues.length ? filterValues : undefined,
                       );
                     }}
                   >
@@ -397,7 +399,7 @@ export function DataTableFacetedFilter({
                         "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
                         isSelected
                           ? "bg-primary text-primary-foreground"
-                          : "opacity-50 [&_svg]:invisible"
+                          : "opacity-50 [&_svg]:invisible",
                       )}
                     >
                       <CheckIcon />

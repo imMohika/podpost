@@ -1,10 +1,10 @@
 import { getCurrentWindow } from "@tauri-apps/api/window";
 
 import { Maximize2Icon, Minimize2Icon, MinusIcon, XIcon } from "lucide-react";
-import { Button } from "./ui/button";
-import { ThemeToggle } from "./theme";
-import { SidebarTrigger } from "./ui/sidebar";
 import { useEffect, useState } from "react";
+import { ThemeToggle } from "./theme";
+import { Button } from "./ui/button";
+import { SidebarTrigger } from "./ui/sidebar";
 
 export const Titlebar = () => {
   const [isMaximized, setMaximized] = useState(false);

@@ -1,5 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
-import { clsx, type ClassValue } from "clsx";
+import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -14,12 +14,13 @@ export function shorten(str: string, n = 5): string {
 const rtf = new Intl.RelativeTimeFormat("en", { style: "short" });
 
 export function relativeTime(timestamp: number) {
+  let ts = timestamp;
   // Convert seconds to milliseconds if needed
-  if (timestamp < 10000000000) {
-    timestamp *= 1000;
+  if (ts < 10000000000) {
+    ts *= 1000;
   }
   const now = Date.now();
-  const diffInSeconds = Math.floor((now - timestamp) / 1000);
+  const diffInSeconds = Math.floor((now - ts) / 1000);
 
   if (diffInSeconds < 60) {
     return rtf.format(-diffInSeconds, "second");
@@ -39,7 +40,7 @@ export function relativeTime(timestamp: number) {
 export function relativeDate(dateStr: string): string {
   try {
     const timestamp = Date.parse(dateStr);
-    if (isNaN(timestamp)) {
+    if (Number.isNaN(timestamp)) {
       throw new Error("Invalid date string");
     }
 
@@ -63,7 +64,7 @@ const dtf = new Intl.DateTimeFormat("en", {
 export function prettifyDate(dateString: string): string {
   try {
     const date = new Date(dateString);
-    if (isNaN(date.getTime())) {
+    if (Number.isNaN(date.getTime())) {
       throw new Error("Invalid date string");
     }
 
@@ -75,7 +76,7 @@ export function prettifyDate(dateString: string): string {
 }
 export async function computePartialFileHash(
   filePath: string,
-  file: Uint8Array
+  file: Uint8Array,
 ) {
   // try to hash with rust
   const chunkSize = 16 * 1024;

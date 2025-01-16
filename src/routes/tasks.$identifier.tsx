@@ -15,25 +15,18 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { shorten } from "@/lib/utils";
 import {
-  ResultSegment,
-  TaskInfo as TTaskInfo,
+  type ResultSegment,
+  type TaskInfo as TTaskInfo,
   TaskInfoQueryOptions,
 } from "@/sdk/task";
 import { useQuery } from "@tanstack/react-query";
-import {
-  createFileRoute,
-  Link,
-  useNavigate,
-  useRouter,
-  useRouterState,
-} from "@tanstack/react-router";
+import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import {
   ArrowLeftIcon,
   ArrowRightIcon,
   ChevronsUpDownIcon,
   CircleXIcon,
   TextIcon,
-  TrashIcon,
 } from "lucide-react";
 import { useState } from "react";
 

@@ -39,7 +39,7 @@ export async function migrate() {
     const hash = migration.name?.replace(".sql", "");
 
     const dbMigrations = (await sqlite.select(
-      /*sql*/ `SELECT id, hash, created_at FROM "__drizzle_migrations" ORDER BY created_at DESC`
+      /*sql*/ `SELECT id, hash, created_at FROM "__drizzle_migrations" ORDER BY created_at DESC`,
     )) as unknown as { id: number; hash: string; created_at: number }[];
 
     const hasBeenRun = (hash: string) =>
@@ -53,7 +53,7 @@ export async function migrate() {
       sqlite.execute(sql, []);
       sqlite.execute(
         /*sql*/ `INSERT INTO "__drizzle_migrations" (hash, created_at) VALUES ($1, $2)`,
-        [hash, Date.now()]
+        [hash, Date.now()],
       );
     }
   }

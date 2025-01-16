@@ -9,22 +9,22 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { db } from "@/db/db";
+import { filesSchema } from "@/db/schema";
 import { computePartialFileHash } from "@/lib/utils";
-import { podcastStoreSelectors, usePodcastStore } from "@/store/podcast";
+import { SpeechToText } from "@/sdk/file";
+import { podcastStoreSelectors } from "@/store/podcast";
 import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
-import { readFile, copyFile, exists, mkdir } from "@tauri-apps/plugin-fs";
-import { InfoIcon } from "lucide-react";
-import { parseBuffer } from "music-metadata";
-import { useEffect, useState } from "react";
 import {
-  appLocalDataDir,
   BaseDirectory,
+  appLocalDataDir,
   basename,
   resolve,
 } from "@tauri-apps/api/path";
-import { SpeechToText } from "@/sdk/file";
-import { db } from "@/db/db";
-import { filesSchema } from "@/db/schema";
+import { copyFile, exists, mkdir, readFile } from "@tauri-apps/plugin-fs";
+import { InfoIcon } from "lucide-react";
+import { parseBuffer } from "music-metadata";
+import { useCallback, useEffect } from "react";
 
 export const Route = createLazyFileRoute("/add")({
   component: AddComponent,
@@ -40,28 +40,37 @@ function AddComponent() {
   const updateHash = podcastStoreSelectors.use.updateHash();
   const updateMetadata = podcastStoreSelectors.use.updateMetadata();
 
-  const loadFile = async (filePath: string) => {
-    return readFile(filePath).then((data) => {
-      updateData(data);
-      return data;
-    });
-  };
+  const loadFile = useCallback(
+    async (filePath: string) => {
+      return readFile(filePath).then((data) => {
+        updateData(data);
+        return data;
+      });
+    },
+    [updateData],
+  );
 
-  const hashFile = async (filePath: string, data: Uint8Array) => {
-    return computePartialFileHash(filePath, data).then((hash) => {
-      updateHash(hash);
-      return hash;
-    });
-  };
+  const hashFile = useCallback(
+    async (filePath: string, data: Uint8Array) => {
+      return computePartialFileHash(filePath, data).then((hash) => {
+        updateHash(hash);
+        return hash;
+      });
+    },
+    [updateHash],
+  );
 
-  const readMetadata = async (filePath: string, data: Uint8Array) => {
-    return parseBuffer(data, {
-      path: filePath,
-    }).then((metadata) => {
-      updateMetadata(metadata);
-      return metadata;
-    });
-  };
+  const readMetadata = useCallback(
+    async (filePath: string, data: Uint8Array) => {
+      return parseBuffer(data, {
+        path: filePath,
+      }).then((metadata) => {
+        updateMetadata(metadata);
+        return metadata;
+      });
+    },
+    [updateMetadata],
+  );
 
   const onSelect = async (filePath: string | null) => {
     if (!filePath) return;
@@ -132,7 +141,7 @@ function AddComponent() {
         readMetadata(path, data);
       });
     });
-  }, []);
+  }, [path, loadFile, hashFile, readMetadata]);
 
   return (
     <div className="p-4 flex flex-col gap-2 h-full min-h-0">
@@ -170,7 +179,7 @@ const PodcastMetadata = () => {
   useEffect(() => {
     console.log({ metadata });
     updateTitle(metadata?.common.title || fileName);
-  }, [metadata, fileName]);
+  }, [metadata, fileName, updateTitle]);
 
   return (
     <div className="flex flex-col gap-2">

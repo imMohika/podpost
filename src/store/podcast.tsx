@@ -1,7 +1,7 @@
-import { IAudioMetadata } from "music-metadata";
+import { basename } from "@tauri-apps/api/path";
+import type { IAudioMetadata } from "music-metadata";
 import { create } from "zustand";
 import { createSelectors } from "./utils";
-import { basename } from "@tauri-apps/api/path";
 
 interface PodcastStoreState {
   path: string | null;

@@ -1,4 +1,4 @@
-import { SpeechToTextParams } from "./file";
+import type { SpeechToTextParams } from "./file";
 
 export const engineTypes = ["whisperx", "whisper.cpp"];
 export type EngineType = (typeof engineTypes)[number];

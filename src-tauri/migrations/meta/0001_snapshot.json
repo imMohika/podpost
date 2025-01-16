@@ -82,23 +82,17 @@
       "indexes": {
         "files_id_unique": {
           "name": "files_id_unique",
-          "columns": [
-            "id"
-          ],
+          "columns": ["id"],
           "isUnique": true
         },
         "files_file_hash_unique": {
           "name": "files_file_hash_unique",
-          "columns": [
-            "file_hash"
-          ],
+          "columns": ["file_hash"],
           "isUnique": true
         },
         "files_task_identifier_unique": {
           "name": "files_task_identifier_unique",
-          "columns": [
-            "task_identifier"
-          ],
+          "columns": ["task_identifier"],
           "isUnique": true
         }
       },

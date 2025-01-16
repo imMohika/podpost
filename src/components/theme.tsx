@@ -1,7 +1,7 @@
+import { atom, useAtom } from "jotai";
+import { MoonIcon, SunIcon } from "lucide-react";
 import { flushSync } from "react-dom";
 import { Button } from "./ui/button";
-import { MoonIcon, SunIcon } from "lucide-react";
-import { atom, useAtom } from "jotai";
 
 type Theme = "dark" | "light";
 
@@ -38,13 +38,13 @@ export const ThemeToggle = () => {
 
     window.document.documentElement.animate(
       {
-        clipPath: [`inset(0 0 0 100%)`, `inset(0 0 0 0)`],
+        clipPath: ["inset(0 0 0 100%)", "inset(0 0 0 0)"],
       },
       {
         duration: 500,
         easing: "ease-in-out",
         pseudoElement: "::view-transition-new(root)",
-      }
+      },
     );
   };
 

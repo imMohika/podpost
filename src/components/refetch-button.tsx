@@ -1,4 +1,6 @@
+import { cn } from "@/lib/utils";
 import { RefreshCwIcon } from "lucide-react";
+import { RelativeTime } from "./relative-time";
 import { Button } from "./ui/button";
 import {
   Tooltip,
@@ -6,11 +8,9 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "./ui/tooltip";
-import { cn } from "@/lib/utils";
-import { RelativeTime } from "./relative-time";
 
 export const RefetchButton: React.FC<{
-  refetch: Function;
+  refetch: () => void;
   isFetching: boolean;
   lastFetched: number;
 }> = ({ refetch, isFetching, lastFetched }) => {

@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import {
   BoxesIcon,
   HomeIcon,
@@ -16,7 +17,6 @@ import {
   SidebarMenuItem,
   Sidebar as UiSidebar,
 } from "./ui/sidebar";
-import { Link } from "@tanstack/react-router";
 
 export const Sidebar = () => {
   return (

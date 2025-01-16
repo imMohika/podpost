@@ -2,9 +2,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { engineTypes } from "@/sdk/constants";
-import { engineStoreSelectors, useEngineStore } from "@/store/engine";
+import { engineStoreSelectors } from "@/store/engine";
 import { createLazyFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
 
 export const Route = createLazyFileRoute("/settings")({
   component: Settings,

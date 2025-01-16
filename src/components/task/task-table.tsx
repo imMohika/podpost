@@ -1,11 +1,12 @@
 import { shorten } from "@/lib/utils";
-import { TaskStatus as TTaskStatus, TaskType as TTaskType } from "@/sdk/task";
-import { ColumnDef } from "@tanstack/react-table";
+import type {
+  TaskStatus as TTaskStatus,
+  TaskType as TTaskType,
+} from "@/sdk/task";
+import { Link } from "@tanstack/react-router";
+import type { ColumnDef } from "@tanstack/react-table";
 import { CheckIcon, InfoIcon } from "lucide-react";
 import { CopyButton } from "../copy-button";
-import { Button } from "../ui/button";
-import { Link } from "@tanstack/react-router";
-import { TaskDeleteButton } from "./task-delete-button";
 import {
   DataTable,
   DataTableColumnHeader,
@@ -14,9 +15,11 @@ import {
   DataTableProvider,
   DataTableToggleFilter,
 } from "../data-table";
-import { TaskType } from "./task-type";
+import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
+import { TaskDeleteButton } from "./task-delete-button";
 import { TaskStatus } from "./task-status";
+import { TaskType } from "./task-type";
 
 const taskTypes = [
   {
@@ -44,7 +47,7 @@ const columns: ColumnDef<TTaskStatus>[] = [
       return (
         <div className="font-medium">
           {shorten(identifier)}
-          <CopyButton value={identifier}></CopyButton>
+          <CopyButton value={identifier} />
         </div>
       );
     },

@@ -1,8 +1,12 @@
-import { create } from "zustand";
+import type { EngineType } from "@/sdk/constants";
 import { LazyStore } from "@tauri-apps/plugin-store";
+import { create } from "zustand";
+import {
+  type StateStorage,
+  createJSONStorage,
+  persist,
+} from "zustand/middleware";
 import { createSelectors } from "./utils";
-import { persist, createJSONStorage, StateStorage } from "zustand/middleware";
-import { EngineType } from "@/sdk/constants";
 
 const persistedStore = new LazyStore("engine.json");
 const storage: StateStorage = {
@@ -52,11 +56,11 @@ export const useEngineStore = create<EngineStoreState & EngineStoreActions>()(
       name: "engine-storage",
       partialize: (state) =>
         Object.fromEntries(
-          Object.entries(state).filter(([key]) => toPersist.includes(key))
+          Object.entries(state).filter(([key]) => toPersist.includes(key)),
         ),
       storage: createJSONStorage(() => storage),
-    }
-  )
+    },
+  ),
 );
 
 export const engineStoreSelectors = createSelectors(useEngineStore);

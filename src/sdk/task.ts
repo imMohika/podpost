@@ -1,12 +1,12 @@
 import { queryOptions } from "@tanstack/react-query";
 import { fetch } from "@tauri-apps/plugin-http";
-import { getApiBase } from "./utils";
-import {
+import type {
   SpeechToTextComputeType,
   SpeechToTextDevice,
   SpeechToTextLanguage,
   SpeechToTextTask,
 } from "./constants";
+import { getApiBase } from "./utils";
 
 export const taskTypes = ["transcription", "full_process"] as const;
 export type TaskType = (typeof taskTypes)[number];

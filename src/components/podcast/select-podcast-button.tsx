@@ -1,10 +1,10 @@
-import { FileIcon } from "lucide-react";
-import { Button } from "../ui/button";
-import { open } from "@tauri-apps/plugin-dialog";
-import { Input } from "../ui/input";
-import { useEffect, useState } from "react";
-import { basename } from "@tauri-apps/api/path";
 import { usePodcastStore } from "@/store/podcast";
+import { basename } from "@tauri-apps/api/path";
+import { open } from "@tauri-apps/plugin-dialog";
+import { FileIcon } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
 
 const podcastTypes = [
   "mp3",

@@ -1,5 +1,5 @@
 import { db } from "@/db/db";
-import { filesSchema, Podcast } from "@/db/schema";
+import { type Podcast, filesSchema } from "@/db/schema";
 import { createLazyFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 

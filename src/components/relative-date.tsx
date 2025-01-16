@@ -1,6 +1,6 @@
 import { prettifyDate, relativeDate } from "@/lib/utils";
-import { Tooltip, TooltipContent, TooltipProvider } from "./ui/tooltip";
 import { TooltipTrigger } from "@radix-ui/react-tooltip";
+import { Tooltip, TooltipContent, TooltipProvider } from "./ui/tooltip";
 
 export const RelativeDate: React.FC<{ date: string }> = ({ date }) => {
   return (

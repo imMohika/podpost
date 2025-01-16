@@ -1,7 +1,7 @@
-import { SelectPodcastButton } from "./select-podcast-button";
-import { Button } from "../ui/button";
-import { Link, useNavigate } from "@tanstack/react-router";
 import { usePodcastStore } from "@/store/podcast";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { Button } from "../ui/button";
+import { SelectPodcastButton } from "./select-podcast-button";
 
 export const PodcastSelect = () => {
   const navigate = useNavigate();

@@ -1,12 +1,12 @@
 import { fetch } from "@tauri-apps/plugin-http";
 import {
   DefaultSpeechToTextParams,
-  SpeechToTextComputeType,
-  SpeechToTextDevice,
-  SpeechToTextinterpolateMethod,
-  SpeechToTextLanguage,
-  SpeechToTextTask,
-  TranscribeModel,
+  type SpeechToTextComputeType,
+  type SpeechToTextDevice,
+  type SpeechToTextLanguage,
+  type SpeechToTextTask,
+  type SpeechToTextinterpolateMethod,
+  type TranscribeModel,
 } from "./constants";
 import { getApiBase } from "./utils";
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -48,7 +48,7 @@ export interface SpeechToTextParams {
 }
 
 const mapParamsToQuery = (
-  params: SpeechToTextParams
+  params: SpeechToTextParams,
 ): Record<string, string> => {
   const mappings: Record<string, string> = {
     deviceIndex: "device_index",
@@ -82,13 +82,13 @@ const mapParamsToQuery = (
       }
       return query;
     },
-    {} as Record<string, string>
+    {} as Record<string, string>,
   );
 };
 
 export const SpeechToText = async (
   fileData: Uint8Array,
-  params = DefaultSpeechToTextParams
+  params = DefaultSpeechToTextParams,
 ): Promise<FileSSTResponse> => {
   const mappedParams = mapParamsToQuery(params);
   const queryString = new URLSearchParams(mappedParams).toString();
