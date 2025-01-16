@@ -1,5 +1,3 @@
-import { shorten, cn } from "@/lib/utils";
-import { TaskStatus } from "@/sdk/task";
 import {
   Column,
   ColumnDef,
@@ -12,112 +10,8 @@ import {
   SortingState,
   useReactTable,
 } from "@tanstack/react-table";
-import {
-  CheckIcon,
-  InfoIcon,
-  TrashIcon,
-  ArrowUpDown,
-  PlusCircleIcon,
-} from "lucide-react";
-import { CopyButton } from "./copy-button";
-import { Button } from "./ui/button";
-import {
-  TableHeader,
-  TableRow,
-  TableHead,
-  TableBody,
-  TableCell,
-  Table,
-} from "./ui/table";
-import { Badge } from "./ui/badge";
-import { useState } from "react";
-import { Separator } from "./ui/separator";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  CommandSeparator,
-} from "./ui/command";
-import { Link } from "@tanstack/react-router";
-import { TaskStatus as TaskStatusComp } from "./task-status";
-import { TaskType } from "./task-type";
-import { TaskDeleteButton } from "./task-delete-button";
 
-const taskTypes = [
-  {
-    value: "transcription",
-    label: "Transcription",
-    icon: InfoIcon,
-  },
-  {
-    value: "align",
-    label: "Align",
-    icon: InfoIcon,
-  },
-];
-
-const columns: ColumnDef<TaskStatus>[] = [
-  {
-    accessorKey: "identifier",
-    header: "Identifier",
-    cell: ({ row }) => {
-      const identifier = String(row.getValue("identifier"));
-      return (
-        <div className="font-medium">
-          {shorten(identifier)}
-          <CopyButton value={identifier}></CopyButton>
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: "task_type",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Type
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => {
-      const type = String(row.getValue("task_type"));
-      return <TaskType type={type} />;
-    },
-  },
-  {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ row }) => {
-      const status = String(row.getValue("status"));
-      return <TaskStatusComp status={status} />;
-    },
-  },
-  {
-    id: "actions",
-    cell: ({ row }) => {
-      const identifier = String(row.getValue("identifier"));
-      return (
-        <div className="flex gap-1">
-          <Button variant={"outline"} size={"icon"} asChild>
-            <Link to="/tasks/$identifier" params={{ identifier }}>
-              <InfoIcon />
-            </Link>
-          </Button>
-
-          <TaskDeleteButton identifier={identifier} type="icon" />
-        </div>
-      );
-    },
-  },
-];
+const columns: ColumnDef<TaskStatus>[] = [];
 
 export const TaskTable: React.FC<{ data: TaskStatus[] }> = ({ data }) => {
   const [sorting, setSorting] = useState<SortingState>([]);

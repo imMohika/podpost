@@ -1,5 +1,5 @@
-import { Badge } from "./ui/badge";
 import { CheckIcon, LoaderIcon } from "lucide-react";
+import { Badge } from "../ui/badge";
 
 export const TaskStatus: React.FC<{ status: string }> = ({ status }) => {
   const isDone = status === "completed";

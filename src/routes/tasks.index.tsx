@@ -1,6 +1,6 @@
 import { AddPodcastButton } from "@/components/podcast/add-podcast-button";
 import { RefetchButton } from "@/components/refetch-button";
-import { TaskTable } from "@/components/task-table";
+import { TaskTable } from "@/components/task/task-table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TaskAllQueryOptions } from "@/sdk/task";
 import { useQuery } from "@tanstack/react-query";

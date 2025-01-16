@@ -1,8 +1,8 @@
 import { CopyButton } from "@/components/copy-button";
 import { RelativeDate } from "@/components/relative-date";
-import { TaskDeleteButton } from "@/components/task-delete-button";
-import { TaskStatus } from "@/components/task-status";
-import { TaskType } from "@/components/task-type";
+import { TaskDeleteButton } from "@/components/task/task-delete-button";
+import { TaskStatus } from "@/components/task/task-status";
+import { TaskType } from "@/components/task/task-type";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

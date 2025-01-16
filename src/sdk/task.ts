@@ -8,7 +8,8 @@ import {
   SpeechToTextTask,
 } from "./constants";
 
-export type TaskType = "transcription" | "full_process";
+export const taskTypes = ["transcription", "full_process"] as const;
+export type TaskType = (typeof taskTypes)[number];
 
 export interface TaskStatus {
   identifier: string;
