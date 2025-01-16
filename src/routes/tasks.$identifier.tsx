@@ -52,9 +52,11 @@ function RouteComponent() {
   return (
     <div className="p-4 flex flex-col gap-2 h-full w-full">
       <div>
-        <Button variant={"outline"}>
-          <ArrowLeftIcon />
-          <Link to="/tasks">Tasks</Link>
+        <Button variant={"outline"} asChild>
+          <Link to="/tasks">
+            <ArrowLeftIcon />
+            Tasks
+          </Link>
         </Button>
       </div>
 
