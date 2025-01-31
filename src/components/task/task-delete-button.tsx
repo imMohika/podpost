@@ -50,9 +50,9 @@ export const TaskDeleteButton: React.FC<{
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction asChild>
-            <Button onClick={() => deleteTask()}>Delete</Button>
-          </AlertDialogAction>
+          <Button onClick={() => deleteTask()} variant="destructive" asChild>
+            <AlertDialogAction>Delete</AlertDialogAction>
+          </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
