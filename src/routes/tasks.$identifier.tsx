@@ -120,21 +120,35 @@ const TaskResult: React.FC<{ result: TTaskInfo["result"] }> = ({ result }) => {
     if (!acc[speakerKey]) {
       acc[speakerKey] = [];
     }
+    segment.text = segment.text.trim();
     acc[speakerKey].push(segment);
     return acc;
   }, {});
 
   return (
     <div className="w-full space-y-2 rounded-md border px-4 py-2 shadow-sm">
-      <h4 className="font-semibold">Result</h4>
+      <div className="flex gap-2 items-center">
+        <h4 className="font-semibold">Result</h4>
+        <CopyButton
+          value={Object.entries(groupedSegments)
+            .map(
+              ([speaker, segments]) =>
+                `${speaker}: ${segments.map((s) => s.text).join("\n")}`,
+            )
+            .join("\n")}
+        />
+      </div>
       {Object.entries(groupedSegments).map(([speaker, segments]) => (
         <div
           className="flex flex-col w-full rounded-md border p-2 shadow-sm gap-1"
           key={speaker}
         >
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
             <TextIcon size={18} />
             <div className="font-bold text-sm">{speaker}</div>
+            <CopyButton
+              value={`${speaker}: ${segments.map((s) => s.text).join("\n")}`}
+            />
           </div>
           {segments.map((segment) => (
             <div
@@ -147,6 +161,9 @@ const TaskResult: React.FC<{ result: TTaskInfo["result"] }> = ({ result }) => {
                 </p>
               </div>
               <p className="pl-2 flex">{segment.text}</p>
+              <div>
+                <CopyButton value={segment.text} />
+              </div>
             </div>
           ))}
         </div>
