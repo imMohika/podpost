@@ -15,4 +15,4 @@ export const filesSchema = sqliteTable("files", {
   createdAt: text("created_at").default("CURRENT_TIMESTAMP"),
 });
 
-export type Podcast = typeof filesSchema.$inferSelect;
+export type TPodcast = typeof filesSchema.$inferSelect;

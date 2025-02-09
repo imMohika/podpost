@@ -1,4 +1,5 @@
 import { CopyButton } from "@/components/copy-button";
+import { RefetchButton } from "@/components/refetch-button";
 import { RelativeDate } from "@/components/relative-date";
 import { TaskDeleteButton } from "@/components/task/task-delete-button";
 import { TaskStatus } from "@/components/task/task-status";
@@ -41,9 +42,9 @@ function RouteComponent() {
   const { identifier } = Route.useParams();
   const navigate = useNavigate();
   const infoQuery = useQuery(TaskInfoQueryOptions(identifier));
-  const { data: info } = infoQuery;
+  const { data: info, isFetching, refetch, dataUpdatedAt } = infoQuery;
   return (
-    <div className="p-4 flex flex-col gap-2 h-full w-full">
+    <div className="p-4 gap-2 flex-auto flex flex-col min-h-0">
       <div>
         <Button variant={"outline"} asChild>
           <Link to="/tasks">
@@ -67,12 +68,19 @@ function RouteComponent() {
           )}
         </div>
 
-        <TaskDeleteButton
-          identifier={identifier}
-          after={() => {
-            navigate({ to: "/tasks" });
-          }}
-        />
+        <div className="flex gap-4">
+          <RefetchButton
+            refetch={refetch}
+            isFetching={isFetching}
+            lastFetched={dataUpdatedAt}
+          />
+          <TaskDeleteButton
+            identifier={identifier}
+            after={() => {
+              navigate({ to: "/tasks" });
+            }}
+          />
+        </div>
       </div>
 
       {info ? <TaskInfo info={info} /> : <Skeleton className="w-full h-12" />}
@@ -81,17 +89,17 @@ function RouteComponent() {
 }
 
 const TaskInfo: React.FC<{ info: TTaskInfo }> = ({ info }) => {
-  if (info.error) {
+  if (info.error || (!info.metadata && info.detail)) {
     return (
       <Alert>
         <CircleXIcon />
         <AlertTitle>Error</AlertTitle>
-        <AlertDescription>{info.error}</AlertDescription>
+        <AlertDescription>{info.error ?? info.detail}</AlertDescription>
       </Alert>
     );
   }
   return (
-    <div className="p-4 flex flex-col gap-4 flex-auto min-h-0">
+    <div className="p-4 flex flex-col gap-4 flex-auto min-h-0 justify-stretch">
       <TaskMetadata metadata={info.metadata} />
       {info.result && (
         <div className="flex flex-col flex-auto min-h-0">

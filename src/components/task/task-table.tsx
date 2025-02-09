@@ -1,8 +1,5 @@
 import { shorten } from "@/lib/utils";
-import type {
-  TaskStatus as TTaskStatus,
-  TaskType as TTaskType,
-} from "@/sdk/task";
+import type { TTaskStatus, TTaskType } from "@/sdk/task";
 import { Link } from "@tanstack/react-router";
 import type { ColumnDef } from "@tanstack/react-table";
 import { CheckIcon, InfoIcon } from "lucide-react";

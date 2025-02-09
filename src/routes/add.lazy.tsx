@@ -1,7 +1,6 @@
 import { SelectPodcastButton } from "@/components/podcast/select-podcast-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Tooltip,
@@ -14,6 +13,7 @@ import { filesSchema } from "@/db/schema";
 import { computePartialFileHash } from "@/lib/utils";
 import { SpeechToText } from "@/sdk/file";
 import { podcastStoreSelectors } from "@/store/podcast";
+import { podcastMetadataStoreSelectors } from "@/store/podcast-metadata";
 import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
 import {
   BaseDirectory,
@@ -24,7 +24,7 @@ import {
 import { copyFile, exists, mkdir, readFile } from "@tauri-apps/plugin-fs";
 import { InfoIcon } from "lucide-react";
 import { parseBuffer } from "music-metadata";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export const Route = createLazyFileRoute("/add")({
   component: AddComponent,
@@ -38,7 +38,12 @@ function AddComponent() {
   const updatePath = podcastStoreSelectors.use.updatePath();
   const updateData = podcastStoreSelectors.use.updateData();
   const updateHash = podcastStoreSelectors.use.updateHash();
-  const updateMetadata = podcastStoreSelectors.use.updateMetadata();
+
+  const title = podcastMetadataStoreSelectors.use.title();
+  const comment = podcastMetadataStoreSelectors.use.comment();
+  const album = podcastMetadataStoreSelectors.use.album();
+  const genre = podcastMetadataStoreSelectors.use.genre();
+  const year = podcastMetadataStoreSelectors.use.year();
 
   const loadFile = useCallback(
     async (filePath: string) => {
@@ -60,25 +65,11 @@ function AddComponent() {
     [updateHash],
   );
 
-  const readMetadata = useCallback(
-    async (filePath: string, data: Uint8Array) => {
-      return parseBuffer(data, {
-        path: filePath,
-      }).then((metadata) => {
-        updateMetadata(metadata);
-        return metadata;
-      });
-    },
-    [updateMetadata],
-  );
-
   const onSelect = async (filePath: string | null) => {
     if (!filePath) return;
     updatePath(filePath);
     loadFile(filePath).then(async (data) => {
-      hashFile(filePath, data).then(() => {
-        readMetadata(filePath, data);
-      });
+      hashFile(filePath, data);
     });
   };
 
@@ -100,6 +91,8 @@ function AddComponent() {
       }
     }
 
+    // todo)) check db for existing podcast
+
     const fileName = await basename(path);
     const toPath = await resolve(await appLocalDataDir(), "library", fileName);
 
@@ -113,16 +106,20 @@ function AddComponent() {
     }
     console.log({ toPath, libraryExists });
 
-    await copyFile(path, toPath);
-
     const { identifier } = await SpeechToText(fileData);
 
     await db.insert(filesSchema).values({
       filePath: toPath,
       fileHash: fileHash,
       taskIdentifier: identifier,
-      // todo)) save metadata
+      title,
+      album,
+      comment,
+      genre,
+      year,
     });
+
+    await copyFile(path, toPath);
 
     navigate({
       to: "/tasks/$identifier",
@@ -137,11 +134,9 @@ function AddComponent() {
     if (!path || path === "") return;
 
     loadFile(path).then(async (data) => {
-      hashFile(path, data).then(() => {
-        readMetadata(path, data);
-      });
+      hashFile(path, data);
     });
-  }, [path, loadFile, hashFile, readMetadata]);
+  }, [path, loadFile, hashFile]);
 
   return (
     <div className="p-4 flex flex-col gap-2 h-full min-h-0">
@@ -170,16 +165,51 @@ function AddComponent() {
 }
 
 const PodcastMetadata = () => {
-  const metadata = podcastStoreSelectors.use.metadata();
   const fileName = podcastStoreSelectors.use.fileName();
+  const filePath = podcastStoreSelectors.use.path();
+  const fileData = podcastStoreSelectors.use.data();
 
-  const title = podcastStoreSelectors.use.title();
-  const updateTitle = podcastStoreSelectors.use.updateTitle();
+  const updateMetadata = podcastMetadataStoreSelectors.use.updateMetadata();
+
+  const title = podcastMetadataStoreSelectors.use.title();
+  const updateTitle = podcastMetadataStoreSelectors.use.updateTitle();
+
+  const comment = podcastMetadataStoreSelectors.use.comment();
+  const updateComment = podcastMetadataStoreSelectors.use.updateComment();
+
+  const album = podcastMetadataStoreSelectors.use.album();
+  const uptateAlbum = podcastMetadataStoreSelectors.use.updateAlbum();
+
+  const genre = podcastMetadataStoreSelectors.use.genre();
+  const updateGenre = podcastMetadataStoreSelectors.use.updateGenre();
+
+  const year = podcastMetadataStoreSelectors.use.year();
+  const updateYear = podcastMetadataStoreSelectors.use.updateYear();
+
+  const [isReading, setReading] = useState(true);
+
+  const loadMetadata = useCallback(async () => {
+    if (!filePath || !fileData) return;
+    setReading(true);
+
+    const parsed = await parseBuffer(fileData, {
+      path: filePath,
+    });
+
+    updateMetadata({
+      title: parsed.common.title ?? fileName,
+      comment: parsed.common.comment?.map((c) => c.text).join(" ") ?? "",
+      album: parsed.common.album ?? "",
+      genre: parsed.common.genre?.join(", ") ?? "",
+      year: parsed.common.year?.toString() ?? "",
+    });
+
+    setReading(false);
+  }, [filePath, fileData, fileName, updateMetadata]);
 
   useEffect(() => {
-    console.log({ metadata });
-    updateTitle(metadata?.common.title || fileName);
-  }, [metadata, fileName, updateTitle]);
+    loadMetadata();
+  }, [loadMetadata]);
 
   return (
     <div className="flex flex-col gap-2">
@@ -197,85 +227,70 @@ const PodcastMetadata = () => {
             </Tooltip>
           </TooltipProvider>
         </div>
-        {!metadata ? (
-          <Skeleton className="h-9 w-full" />
-        ) : (
-          <Input
-            type="text"
-            value={title}
-            onChange={(e) => {
-              e.preventDefault();
-              updateTitle(e.target.value);
-            }}
-          />
-        )}
+        <Input
+          type="text"
+          value={title}
+          disabled={isReading}
+          onChange={(e) => {
+            e.preventDefault();
+            updateTitle(e.target.value);
+          }}
+        />
       </div>
 
       <div className="rounded-md border px-4 py-2 text-sm shadow-sm flex gap-2 justify-center flex-col">
         <div className="flex items-center gap-1">
           <p className="font-semibold">Comment</p>
         </div>
-        {!metadata ? (
-          <Skeleton className="h-9 w-full" />
-        ) : (
-          <Textarea
-            value={metadata.common.comment?.map((c) => c.text).join(" ")}
-            onChange={(e) => {
-              e.preventDefault();
-              // updateTitle(e.target.value);
-            }}
-          />
-        )}
+        <Textarea
+          disabled={isReading}
+          value={comment}
+          onChange={(e) => {
+            e.preventDefault();
+            updateComment(e.target.value);
+          }}
+        />
       </div>
 
       <div className="rounded-md border px-4 py-2 text-sm shadow-sm flex gap-2 justify-center flex-col">
         <div className="flex items-center gap-1">
           <p className="font-semibold">Album</p>
         </div>
-        {!metadata ? (
-          <Skeleton className="h-9 w-full" />
-        ) : (
-          <Input
-            type="text"
-            value={metadata.common.album}
-            onChange={(e) => {
-              e.preventDefault();
-              // updateTitle(e.target.value);
-            }}
-          />
-        )}
+        <Input
+          type="text"
+          disabled={isReading}
+          value={album}
+          onChange={(e) => {
+            e.preventDefault();
+            uptateAlbum(e.target.value);
+          }}
+        />
       </div>
 
       <div className="rounded-md border px-4 py-2 text-sm shadow-sm flex gap-2 items-center justify-between">
         <p className="font-semibold">Genre</p>
-        {!metadata ? (
-          <Skeleton className="h-9 w-full" />
-        ) : (
-          <Input
-            type="text"
-            value={metadata.common.genre}
-            onChange={(e) => {
-              e.preventDefault();
-              // updateTitle(e.target.value);
-            }}
-          />
-        )}
+        <Input
+          type="text"
+          disabled={isReading}
+          value={genre}
+          onChange={(e) => {
+            e.preventDefault();
+            updateGenre(e.target.value);
+          }}
+        />
       </div>
 
       <div className="rounded-md border px-4 py-2 text-sm shadow-sm flex gap-2 items-center justify-between">
         <p className="font-semibold">Year</p>
-        {!metadata ? (
-          <Skeleton className="h-9 w-full" />
-        ) : (
-          <Input
-            type="text"
-            value={metadata.common.year}
-            onChange={(e) => {
-              e.preventDefault();
-              // updateTitle(e.target.value);
-            }}
-          />
-        )}
+        <Input
+          type="number"
+          disabled={isReading}
+          value={year}
+          onChange={(e) => {
+            e.preventDefault();
+            updateYear(+e.target.value);
+          }}
+        />
       </div>
     </div>
   );

@@ -9,15 +9,15 @@ import type {
 import { getApiBase } from "./utils";
 
 export const taskTypes = ["transcription", "full_process"] as const;
-export type TaskType = (typeof taskTypes)[number];
+export type TTaskType = (typeof taskTypes)[number];
 
-export interface TaskStatus {
+export interface TTaskStatus {
   identifier: string;
   status: string;
-  task_type: TaskType;
+  task_type: TTaskType;
 }
 
-export const TaskAll = async (): Promise<TaskStatus[]> => {
+export const TaskAll = async (): Promise<TTaskStatus[]> => {
   console.info("Fetching all tasks...");
   const url = `${getApiBase()}/task/all`;
 
@@ -26,7 +26,7 @@ export const TaskAll = async (): Promise<TaskStatus[]> => {
   const response = await fetch(url);
 
   type JSONResponse = {
-    tasks: TaskStatus[];
+    tasks: TTaskStatus[];
   };
 
   const { tasks }: JSONResponse = await response.json();
@@ -94,7 +94,8 @@ export interface TaskInfo {
   status: string;
   result: TaskResult | null;
   metadata: TaskMetadata;
-  error: string;
+  error?: string;
+  detail?: string;
 }
 
 export const TaskInfo = async (identifier: string): Promise<TaskInfo> => {

@@ -1,4 +1,4 @@
-import { usePodcastStore } from "@/store/podcast";
+import { podcastStoreSelectors } from "@/store/podcast";
 import { basename } from "@tauri-apps/api/path";
 import { open } from "@tauri-apps/plugin-dialog";
 import { FileIcon } from "lucide-react";
@@ -22,7 +22,7 @@ export const SelectPodcastButton: React.FC<{
   onSelect: (filePath: string | null) => void;
   variant?: "combined" | "default";
 }> = ({ onSelect, variant = "default" }) => {
-  const path = usePodcastStore.use.path();
+  const path = podcastStoreSelectors.use.path();
   const [name, setName] = useState("");
 
   const select = async () => {
