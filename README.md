@@ -11,8 +11,8 @@ A Podcast Manager with built-in transcription (using openai's [Whisper](https://
 ### Phase 1: Transcription
 
 - [x] Transcribe audio files using [WhisperX-FastApi](https://github.com/pavelzbornik/whisperX-FastAPI)
-- [ ] Save transcribed audio files
-- [ ] Library & Tasks view
+- [x] Save transcribed audio files
+- [x] Library & Tasks view
 - [ ] Settings for engine type
 - [ ] Built-in Whisper support using [whisper-rs](https://github.com/tazz4843/whisper-rs)
 
